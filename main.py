@@ -15,20 +15,35 @@ class AutoCompleteData:
     score: int
 
 
-def clean_sentence(sentence: str) -> str:
+# def clean_sentence1(sentence: str) -> str:
+#     """
+#     Cleans a sentence: removes punctuation, extra spaces, and converts to lowercase.
+#     """
+#     translator = str.maketrans('', '', string.punctuation)
+#     return re.sub(r'\s+', ' ', sentence.strip().lower().translate(translator))
+
+# def clean_sentence2(sentence: str) -> str:
+#     """
+#     Cleans a sentence: removes punctuation, extra spaces, and converts to lowercase using basic string operations.
+#     """
+#     translator = str.maketrans('', '', string.punctuation)
+#     # Use str.split() and ' '.join() to remove excess spaces instead of re.sub
+#     return ' '.join(sentence.strip().lower().translate(translator).split())
+
+def clean_sentence(sentence: str) -> List[str]:
     """
-    Cleans a sentence: removes punctuation, extra spaces, and converts to lowercase.
+    Cleans a sentence: removes punctuation, extra spaces, and converts to lowercase, returning a list of words.
     """
     translator = str.maketrans('', '', string.punctuation)
-    return re.sub(r'\s+', ' ', sentence.strip().lower().translate(translator))
-
+    return sentence.strip().lower().translate(translator).split()
 
 def add_to_inverted_index(inverted_index: Dict[str, List[Tuple[int, int]]], sentence: str, sentence_id: int) -> None:
     """
     Adds sentence ID and word position to the inverted index.
     Now each word is associated with a list of tuples (sentence_id, word_position).
     """
-    words = clean_sentence(sentence).split()
+    # words = clean_sentence(sentence).split()
+    words = clean_sentence(sentence)
 
     for index, word in enumerate(words):
         inverted_index[word].append((sentence_id, index))  # Store both the sentence ID and word position
@@ -170,7 +185,8 @@ def get_top_k_completions(user_input: str, data_store: List[Dict], inverted_inde
     Now it considers the score for ranking.
     """
     cleaned_input = clean_sentence(user_input)  # Clean the user input
-    user_words = cleaned_input.split()  # Split the input into individual words
+    # user_words = cleaned_input.split()  # Split the input into individual words
+    user_words = cleaned_input  # Split the input into individual words
     matched_sentences = match_sentences(user_words, inverted_index)  # Get matching sentences and their scores
 
     # Convert matched sentence IDs and their scores into AutoCompleteData objects
